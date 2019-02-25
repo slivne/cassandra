@@ -68,20 +68,23 @@ public class SchemaInsert extends SchemaStatement
     private class JavaDriverRun extends Runner
     {
         final JavaDriverClient client;
+        List<BoundStatement> stmts;
 
         private JavaDriverRun(JavaDriverClient client)
         {
             this.client = client;
+            this.stmts = new ArrayList<>();
         }
 
         public boolean run() throws Exception
         {
-            List<BoundStatement> stmts = new ArrayList<>();
             partitionCount = partitions.size();
 
-            for (PartitionIterator iterator : partitions)
-                while (iterator.hasNext())
-                    stmts.add(bindRow(iterator.next()));
+            if (stmts.size() == 0) {
+                for (PartitionIterator iterator : partitions)
+                    while (iterator.hasNext())
+                        stmts.add(bindRow(iterator.next()));
+            }
 
             rowCount += stmts.size();
 
